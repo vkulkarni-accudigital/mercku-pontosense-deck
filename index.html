@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercku × Pontosense — Smart Home Platform</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #07101F;
+    --navy2: #0D1B3E;
+    --teal: #00C2C7;
+    --teal-dim: rgba(0,194,199,0.15);
+    --blue: #2D5BE3;
+    --blue-dim: rgba(45,91,227,0.15);
+    --glow-teal: rgba(0,194,199,0.4);
+    --glow-blue: rgba(45,91,227,0.4);
+    --text: #F4F7FF;
+    --muted: #8A9CC5;
+    --gold: #FFD166;
+    --green: #06D6A0;
+    --card: #111D3A;
+    --border: #1E3060;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--teal), var(--blue));
+    z-index: 1000;
+    transition: width 0.1s linear;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(7,16,31,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: all 0.3s;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+
+  .nav-pill {
+    padding: 5px 14px;
+    border-radius: 100px;
+    border: 1px solid;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav-pill.teal { border-color: var(--teal); color: var(--teal); }
+  .nav-pill.blue { border-color: var(--blue); color: #8AABFF; }
+  .nav-sep { color: var(--muted); font-size: 18px; }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  /* ── SECTIONS ── */
+  section {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── HERO: THE SPLIT WORLD ── */
+  #hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Left half: Pontosense */
+  .hero-left {
+    background: linear-gradient(135deg, #040C1A 0%, #0A1628 40%, #0D1F45 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 64px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Animated pulse rings on Pontosense side */
+  .pulse-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--blue);
+    opacity: 0;
+    animation: pulse-expand 3s ease-out infinite;
+  }
+
+  .pulse-ring:nth-child(1) { width: 200px; height: 200px; top: 50%; left: 60%; transform: translate(-50%,-50%); animation-delay: 0s; }
+  .pulse-ring:nth-child(2) { width: 350px; height: 350px; top: 50%; left: 60%; transform: translate(-50%,-50%); animation-delay: 0.8s; }
+  .pulse-ring:nth-child(3) { width: 500px; height: 500px; top: 50%; left: 60%; transform: translate(-50%,-50%); animation-delay: 1.6s; }
+
+  @keyframes pulse-expand {
+    0% { opacity: 0.6; transform: translate(-50%,-50%) scale(0.5); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1); }
+  }
+
+  /* Right half: Mercku */
+  .hero-right {
+    background: linear-gradient(225deg, #040C1A 0%, #080E1E 40%, #051822 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 120px 64px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* WiFi rings on Mercku side */
+  .wifi-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--teal);
+    opacity: 0;
+    animation: wifi-expand 2.5s ease-out infinite;
+  }
+
+  .wifi-ring:nth-child(1) { width: 160px; height: 160px; top: 50%; left: 40%; transform: translate(-50%,-50%); animation-delay: 0s; }
+  .wifi-ring:nth-child(2) { width: 300px; height: 300px; top: 50%; left: 40%; transform: translate(-50%,-50%); animation-delay: 0.7s; }
+  .wifi-ring:nth-child(3) { width: 460px; height: 460px; top: 50%; left: 40%; transform: translate(-50%,-50%); animation-delay: 1.4s; }
+  .wifi-ring:nth-child(4) { width: 620px; height: 620px; top: 50%; left: 40%; transform: translate(-50%,-50%); animation-delay: 2.1s; }
+
+  @keyframes wifi-expand {
+    0% { opacity: 0.5; transform: translate(-50%,-50%) scale(0.3); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1); }
+  }
+
+  /* Center divider with merge line */
+  .hero-divider {
+    position: absolute;
+    top: 0; left: 50%;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--teal) 30%, var(--blue) 70%, transparent);
+    transform: translateX(-50%);
+    z-index: 10;
+  }
+
+  .hero-divider::after {
+    content: '×';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--navy);
+    color: var(--text);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 300;
+  }
+
+  /* Merge overlay — appears on scroll */
+  .hero-merge {
+    position: absolute;
+    inset: 0;
+    background: var(--navy);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 0.8s;
+  }
+
+  .hero-left-content, .hero-right-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-right-content { text-align: right; }
+
+  .brand-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .brand-label.left { color: var(--blue); }
+  .brand-label.right { color: var(--teal); }
+
+  .hero-stat {
+    font-size: 72px;
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 8px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-stat.teal { color: var(--teal); }
+  .hero-stat.blue { color: #8AABFF; }
+
+  .hero-stat-label {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+  }
+
+  .hero-stat.visible, .hero-stat-label.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Mercku router SVG */
+  .router-wrap {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+    opacity: 0.9;
+    z-index: 1;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-12px); }
+  }
+
+  /* Pontosense device */
+  .sensor-wrap {
+    position: absolute;
+    top: 50%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    opacity: 0.9;
+    z-index: 1;
+    animation: float2 4s ease-in-out infinite 1s;
+  }
+
+  @keyframes float2 {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-10px); }
+  }
+
+  /* Hero headline (appears after merge) */
+  .hero-headline {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.8s 0.3s;
+    width: 60%;
+    pointer-events: none;
+  }
+
+  .hero-headline h1 {
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .hero-headline h1 em { font-style: normal; color: var(--teal); }
+  .hero-headline p { font-size: 16px; color: var(--muted); max-width: 500px; margin: 0 auto; }
+
+  /* Scroll indicator */
+  .scroll-cue {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 20;
+    animation: bob 2s ease-in-out infinite;
+  }
+
+  @keyframes bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  .scroll-cue svg { opacity: 0.5; }
+
+  /* ── FLOOR PLAN SECTION ── */
+  #floorplan {
+    background: var(--navy);
+    padding: 120px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 3vw, 42px);
+    font-weight: 300;
+    text-align: center;
+    max-width: 600px;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    font-size: 16px;
+    text-align: center;
+    max-width: 500px;
+    margin-bottom: 64px;
+  }
+
+  /* Floor plan container */
+  .floor-plan-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  /* Room zones */
+  .room {
+    position: absolute;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 12px 14px;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .room-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.4s;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Sensing zone glow — activates via JS */
+  .room-glow {
+    position: absolute;
+    border-radius: 50%;
+    transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  .room.active .room-glow {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  .room.active .room-label { color: var(--text); }
+  .room.active { border-color: rgba(0,194,199,0.25); }
+
+  /* Stat pills below floor plan */
+  .stat-pills {
+    display: flex;
+    gap: 16px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat-pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .stat-pill.visible { opacity: 1; transform: translateY(0); }
+
+  .pill-num { font-size: 20px; font-weight: 500; color: var(--gold); }
+  .pill-text { font-size: 13px; color: var(--muted); }
+
+  /* ── CAPABILITIES (features row) ── */
+  #capabilities {
+    padding: 100px 80px;
+    background: linear-gradient(to bottom, var(--navy) 0%, #080E1E 100%);
+  }
+
+  .cap-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 56px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cap-card {
+    background: var(--card);
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.7s cubic-bezier(0.16,1,0.3,1);
+    cursor: default;
+  }
+
+  .cap-card:first-child { border-radius: 12px 0 0 12px; }
+  .cap-card:last-child { border-radius: 0 12px 12px 0; }
+
+  .cap-card.visible { opacity: 1; transform: translateY(0); }
+
+  .cap-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent, var(--teal));
+    transform: scaleX(0);
+    transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    transform-origin: left;
+  }
+
+  .cap-card.visible::before { transform: scaleX(1); }
+
+  .cap-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+
+  .cap-card h3 { font-size: 15px; font-weight: 500; margin-bottom: 10px; }
+  .cap-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ── BUSINESS CASE ── */
+  #business {
+    padding: 120px 80px;
+    background: var(--navy);
+  }
+
+  .biz-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    max-width: 1100px;
+    margin: 64px auto 0;
+    align-items: start;
+  }
+
+  /* Steps */
+  .step-wrap { display: flex; flex-direction: column; gap: 0; }
+
+  .step {
+    display: flex;
+    gap: 24px;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-24px);
+    transition: all 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .step.visible { opacity: 1; transform: translateX(0); }
+
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .step-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .step-line {
+    width: 1px;
+    flex: 1;
+    min-height: 40px;
+    background: linear-gradient(to bottom, var(--border), transparent);
+  }
+
+  .step:last-child .step-line { display: none; }
+
+  .step-content { padding-bottom: 36px; }
+  .step-content h3 { font-size: 17px; font-weight: 500; margin-bottom: 8px; margin-top: 10px; }
+  .step-content p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* Pricing / Revenue right column */
+  .pricing-stack { display: flex; flex-direction: column; gap: 16px; }
+
+  .price-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .price-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.7s cubic-bezier(0.16,1,0.3,1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .price-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .price-card.teal::before { background: var(--teal); }
+  .price-card.blue::before { background: var(--blue); }
+
+  .price-card.visible { opacity: 1; transform: translateY(0); }
+
+  .price-big {
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .price-card.teal .price-big { color: var(--teal); }
+  .price-card.blue .price-big { color: #8AABFF; }
+
+  .price-label { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .price-sub { font-size: 11px; color: var(--muted); }
+
+  /* Revenue table */
+  .rev-card {
+    background: #060C1A;
+    border: 1px solid var(--teal);
+    border-radius: 12px;
+    padding: 24px;
+    opacity: 0;
+    transition: opacity 0.7s 0.3s;
+  }
+
+  .rev-card.visible { opacity: 1; }
+
+  .rev-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 16px;
+  }
+
+  .rev-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .rev-row:last-child { border-bottom: none; }
+  .rev-row.visible { opacity: 1; }
+
+  .rev-subs { color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .rev-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .rev-hwrev { font-weight: 500; }
+  .rev-mrr { font-weight: 600; }
+  .rev-row:nth-child(2) .rev-mrr { color: var(--green); }
+  .rev-row:nth-child(3) .rev-mrr { color: var(--green); }
+  .rev-row:nth-child(4) .rev-mrr { color: var(--gold); }
+
+  /* Why it works */
+  .why-card {
+    background: var(--card);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+    padding: 20px 24px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.7s 0.5s;
+  }
+
+  .why-card.visible { opacity: 1; transform: translateY(0); }
+
+  .why-card h4 {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .why-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .why-item {
+    font-size: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 5px 14px;
+    color: var(--muted);
+  }
+
+  .why-item strong { color: var(--text); font-weight: 500; }
+
+  /* ── CTA ── */
+  #cta {
+    padding: 100px 80px;
+    background: linear-gradient(to bottom, #080E1E, var(--navy));
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cta-box {
+    background: linear-gradient(135deg, rgba(45,91,227,0.15), rgba(0,194,199,0.1));
+    border: 1px solid rgba(45,91,227,0.4);
+    border-radius: 20px;
+    padding: 56px 64px;
+    max-width: 700px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .cta-box.visible { opacity: 1; transform: translateY(0); }
+
+  .cta-box h2 { font-size: 32px; font-weight: 300; margin-bottom: 12px; }
+  .cta-box p { font-size: 16px; color: var(--muted); margin-bottom: 32px; }
+
+  .cta-contacts {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .cta-contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .cta-contact-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .cta-contact-val { font-size: 14px; font-weight: 500; color: var(--teal); }
+
+  .cta-trust {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .trust-badge {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .trust-badge::before { content: '✓'; color: var(--green); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 24px 80px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── REVEAL ANIMATIONS ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Stagger delays */
+  .delay-1 { transition-delay: 0.1s; }
+  .delay-2 { transition-delay: 0.2s; }
+  .delay-3 { transition-delay: 0.3s; }
+  .delay-4 { transition-delay: 0.4s; }
+
+  /* ── COUNTER ANIMATION ── */
+  .count-up { font-variant-numeric: tabular-nums; }
+
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<nav>
+  <div class="nav-brand">
+    <span class="nav-pill teal">MERCKU</span>
+    <span class="nav-sep">×</span>
+    <span class="nav-pill blue">PONTOSENSE</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#floorplan">Platform</a></li>
+    <li><a href="#capabilities">Capabilities</a></li>
+    <li><a href="#business">For ISPs</a></li>
+    <li><a href="#cta">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO: SPLIT WORLD ─── -->
+<section id="hero">
+  <!-- Pontosense Left -->
+  <div class="hero-left">
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+
+    <!-- Pontosense sensor device (SVG) -->
+    <div class="sensor-wrap">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <!-- Device body -->
+        <circle cx="60" cy="60" r="48" fill="#0D1B3E" stroke="#2D5BE3" stroke-width="1.5"/>
+        <circle cx="60" cy="60" r="36" fill="#111D3A" stroke="#2D5BE3" stroke-width="0.8" stroke-opacity="0.5"/>
+        <!-- Heart/pulse icon in center -->
+        <path d="M44 62L50 56L56 68L62 50L68 62L74 62" stroke="#2D5BE3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- Outer glow ring -->
+        <circle cx="60" cy="60" r="52" stroke="#2D5BE3" stroke-width="0.5" stroke-opacity="0.3"/>
+      </svg>
+    </div>
+
+    <div class="hero-left-content">
+      <div class="brand-label left">Pontosense Silver Shield</div>
+
+      <div class="hero-stat blue" id="stat-fall">Near 100%</div>
+      <div class="hero-stat-label" id="stat-fall-label">Fall detection accuracy</div>
+
+      <div class="hero-stat blue" id="stat-privacy">Zero</div>
+      <div class="hero-stat-label" id="stat-privacy-label">Cameras or wearables needed</div>
+
+      <div class="hero-stat blue" id="stat-patents">500+</div>
+      <div class="hero-stat-label" id="stat-patents-label">Wireless sensing patents</div>
+    </div>
+  </div>
+
+  <!-- Split divider -->
+  <div class="hero-divider"></div>
+
+  <!-- Mercku Right -->
+  <div class="hero-right">
+    <div class="wifi-ring"></div>
+    <div class="wifi-ring"></div>
+    <div class="wifi-ring"></div>
+    <div class="wifi-ring"></div>
+
+    <!-- Mercku router (SVG) -->
+    <div class="router-wrap">
+      <svg width="130" height="110" viewBox="0 0 130 110" fill="none">
+        <!-- Router base -->
+        <rect x="20" y="62" width="90" height="32" rx="8" fill="#0D1B3E" stroke="#00C2C7" stroke-width="1.5"/>
+        <!-- Router body detail -->
+        <rect x="28" y="70" width="74" height="16" rx="4" fill="#111D3A"/>
+        <!-- LED dots -->
+        <circle cx="38" cy="78" r="3" fill="#00C2C7" opacity="0.9"/>
+        <circle cx="48" cy="78" r="3" fill="#00C2C7" opacity="0.6"/>
+        <circle cx="58" cy="78" r="3" fill="#00C2C7" opacity="0.3"/>
+        <!-- Antenna left -->
+        <line x1="36" y1="62" x2="28" y2="18" stroke="#00C2C7" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="28" cy="15" r="4" fill="#00C2C7" opacity="0.8"/>
+        <!-- Antenna right -->
+        <line x1="94" y1="62" x2="102" y2="18" stroke="#00C2C7" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="102" cy="15" r="4" fill="#00C2C7" opacity="0.8"/>
+        <!-- WiFi arc symbol -->
+        <path d="M55 52 Q65 44 75 52" stroke="#00C2C7" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M50 46 Q65 36 80 46" stroke="#00C2C7" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.5"/>
+        <circle cx="65" cy="57" r="3" fill="#00C2C7"/>
+      </svg>
+    </div>
+
+    <div class="hero-right-content">
+      <div class="brand-label right">Mercku M6s AX3000</div>
+
+      <div class="hero-stat teal" id="stat-speed">3 Gbps</div>
+      <div class="hero-stat-label" id="stat-speed-label">Over-the-air WiFi speeds</div>
+
+      <div class="hero-stat teal" id="stat-coverage">3,000 sq ft</div>
+      <div class="hero-stat-label" id="stat-coverage-label">Per router, expandable</div>
+
+      <div class="hero-stat teal" id="stat-setup">1-click</div>
+      <div class="hero-stat-label" id="stat-setup-label">EasyMesh deployment</div>
+    </div>
+  </div>
+
+  <!-- Merge overlay + unified headline -->
+  <div class="hero-merge" id="hero-merge"></div>
+  <div class="hero-headline" id="hero-headline">
+    <h1>Your WiFi Router.<br><em>Now a Life Safety Platform.</em></h1>
+    <p>Mercku mesh WiFi + Pontosense intelligent sensing — delivered by ISPs to families who want peace of mind at home.</p>
+  </div>
+
+  <div class="scroll-cue">
+    <span>Scroll to explore</span>
+    <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+      <rect x="1" y="1" width="14" height="22" rx="7" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="8" cy="7" r="2" fill="currentColor"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ─── FLOOR PLAN: SENSING ZONES ─── -->
+<section id="floorplan">
+  <div class="section-label reveal">The Smart Home Platform</div>
+  <h2 class="section-title reveal delay-1">Whole-home sensing. <br>No cameras. No wearables.</h2>
+  <p class="section-sub reveal delay-2">Pontosense activates sensing zones through the Mercku router signal. Every room covered — bedroom, bathroom, living room, kitchen.</p>
+
+  <div class="floor-plan-wrap reveal delay-3">
+    <svg id="floor-svg" width="100%" viewBox="0 0 800 480" fill="none" style="display:block;">
+
+      <!-- House outline -->
+      <rect x="60" y="40" width="680" height="400" rx="8" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+
+      <!-- Internal walls -->
+      <!-- Vertical center divider -->
+      <line x1="380" y1="40" x2="380" y2="440" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+      <!-- Horizontal midlines -->
+      <line x1="60" y1="220" x2="380" y2="220" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+      <line x1="380" y1="260" x2="740" y2="260" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+      <!-- Bathroom divider -->
+      <line x1="540" y1="260" x2="540" y2="440" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+
+      <!-- Door openings (gaps) -->
+      <line x1="280" y1="218" x2="340" y2="218" stroke="#07101F" stroke-width="3"/>
+      <line x1="280" y1="222" x2="340" y2="222" stroke="#07101F" stroke-width="3"/>
+      <line x1="378" y1="130" x2="382" y2="130" stroke="#07101F" stroke-width="3"/>
+      <line x1="538" y1="330" x2="542" y2="380" stroke="#07101F" stroke-width="3"/>
+
+      <!-- ROOM GLOWS (colored fill zones, hidden initially) -->
+      <!-- Bedroom (top-left) -->
+      <rect id="glow-bedroom" x="62" y="42" width="316" height="176" rx="6"
+            fill="rgba(45,91,227,0)" stroke="none" transition="fill 0.8s"/>
+      <!-- Living Room (bottom-left) -->
+      <rect id="glow-living" x="62" y="222" width="316" height="216" rx="6"
+            fill="rgba(0,194,199,0)" stroke="none"/>
+      <!-- Kitchen (top-right) -->
+      <rect id="glow-kitchen" x="382" y="42" width="356" height="216" rx="6"
+            fill="rgba(255,209,102,0)" stroke="none"/>
+      <!-- Bathroom (bottom-right-right) -->
+      <rect id="glow-bathroom" x="542" y="262" width="196" height="176" rx="6"
+            fill="rgba(106,232,153,0)" stroke="none"/>
+      <!-- Hallway (bottom-right-left) -->
+      <rect id="glow-hallway" x="382" y="262" width="156" height="176" rx="6"
+            fill="rgba(139,92,246,0)" stroke="none"/>
+
+      <!-- ROOM LABELS -->
+      <text x="90" y="72" fill="rgba(138,156,197,0.5)" font-family="'DM Sans', sans-serif" font-size="11" font-weight="600" letter-spacing="0.1em" text-transform="uppercase" id="lbl-bedroom">BEDROOM</text>
+      <text x="90" y="250" fill="rgba(138,156,197,0.5)" font-family="'DM Sans', sans-serif" font-size="11" font-weight="600" letter-spacing="0.1em" id="lbl-living">LIVING ROOM</text>
+      <text x="410" y="72" fill="rgba(138,156,197,0.5)" font-family="'DM Sans', sans-serif" font-size="11" font-weight="600" letter-spacing="0.1em" id="lbl-kitchen">KITCHEN / DINING</text>
+      <text x="570" y="290" fill="rgba(138,156,197,0.5)" font-family="'DM Sans', sans-serif" font-size="11" font-weight="600" letter-spacing="0.1em" id="lbl-bathroom">BATHROOM</text>
+      <text x="390" y="290" fill="rgba(138,156,197,0.5)" font-family="'DM Sans', sans-serif" font-size="11" font-weight="600" letter-spacing="0.1em" id="lbl-hallway">HALLWAY</text>
+
+      <!-- Furniture silhouettes (bedroom) -->
+      <rect x="88" y="120" width="100" height="80" rx="4" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <rect x="200" y="140" width="40" height="40" rx="3" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+      <!-- Furniture silhouettes (living room) -->
+      <rect x="88" y="300" width="140" height="60" rx="4" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <rect x="90" y="380" width="80" height="40" rx="4" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+      <!-- Furniture (kitchen) -->
+      <rect x="500" y="60" width="220" height="50" rx="4" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <rect x="390" y="60" width="60" height="60" rx="4" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+      <!-- Bathroom fixtures -->
+      <rect x="560" y="380" width="50" height="36" rx="20" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+      <rect x="620" y="380" width="40" height="36" rx="4" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+      <!-- Mercku Router position (center of home) -->
+      <g id="router-icon" opacity="0" transform="translate(380,220)">
+        <circle r="20" fill="#0D1B3E" stroke="#00C2C7" stroke-width="1.5"/>
+        <path d="M-8 2L-3 -3L2 5L7 -7L12 2L17 2" stroke="#00C2C7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle r="28" fill="none" stroke="#00C2C7" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.4">
+          <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="20s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- Sensing coverage arc labels (appear per room) -->
+      <text id="cap-bedroom" x="220" y="170" fill="rgba(45,91,227,0)" font-family="'DM Mono', monospace" font-size="10" text-anchor="middle" transition="fill 0.8s">♡ Vitals · Movement · Falls</text>
+      <text id="cap-living" x="220" y="390" fill="rgba(0,194,199,0)" font-family="'DM Mono', monospace" font-size="10" text-anchor="middle">Presence · Fall Detection</text>
+      <text id="cap-kitchen" x="560" y="180" fill="rgba(255,209,102,0)" font-family="'DM Mono', monospace" font-size="10" text-anchor="middle">Activity · Safety Check</text>
+      <text id="cap-bathroom" x="638" y="420" fill="rgba(106,232,153,0)" font-family="'DM Mono', monospace" font-size="10" text-anchor="middle">Fall Detection · Proof of Life</text>
+      <text id="cap-hallway" x="460" y="420" fill="rgba(139,92,246,0)" font-family="'DM Mono', monospace" font-size="10" text-anchor="middle">Occupancy Monitoring</text>
+    </svg>
+
+    <!-- Sensing indicator legend -->
+    <div style="display:flex; gap:20px; justify-content:center; margin-top:24px; flex-wrap:wrap;" id="zone-legend">
+      <div class="zone-btn" data-room="bedroom" onclick="activateRoom('bedroom')" style="cursor:pointer;padding:8px 18px;border-radius:100px;border:1px solid rgba(45,91,227,0.4);font-size:12px;color:rgba(138,156,197,0.7);transition:all 0.3s;font-family:'DM Sans',sans-serif;">
+        <span style="color:#2D5BE3">●</span> Bedroom
+      </div>
+      <div class="zone-btn" data-room="living" onclick="activateRoom('living')" style="cursor:pointer;padding:8px 18px;border-radius:100px;border:1px solid rgba(0,194,199,0.4);font-size:12px;color:rgba(138,156,197,0.7);transition:all 0.3s;font-family:'DM Sans',sans-serif;">
+        <span style="color:#00C2C7">●</span> Living Room
+      </div>
+      <div class="zone-btn" data-room="kitchen" onclick="activateRoom('kitchen')" style="cursor:pointer;padding:8px 18px;border-radius:100px;border:1px solid rgba(255,209,102,0.4);font-size:12px;color:rgba(138,156,197,0.7);transition:all 0.3s;font-family:'DM Sans',sans-serif;">
+        <span style="color:#FFD166">●</span> Kitchen
+      </div>
+      <div class="zone-btn" data-room="bathroom" onclick="activateRoom('bathroom')" style="cursor:pointer;padding:8px 18px;border-radius:100px;border:1px solid rgba(106,232,153,0.4);font-size:12px;color:rgba(138,156,197,0.7);transition:all 0.3s;font-family:'DM Sans',sans-serif;">
+        <span style="color:#6AE899">●</span> Bathroom
+      </div>
+      <div class="zone-btn" data-room="hallway" onclick="activateRoom('hallway')" style="cursor:pointer;padding:8px 18px;border-radius:100px;border:1px solid rgba(139,92,246,0.4);font-size:12px;color:rgba(138,156,197,0.7);transition:all 0.3s;font-family:'DM Sans',sans-serif;">
+        <span style="color:#8B5CF6">●</span> Hallway
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-pills">
+    <div class="stat-pill" id="pill1">
+      <span class="pill-num">1 in 3</span>
+      <span class="pill-text">elderly fall each year</span>
+    </div>
+    <div class="stat-pill" id="pill2">
+      <span class="pill-num">90%+</span>
+      <span class="pill-text">prefer to age in place</span>
+    </div>
+    <div class="stat-pill" id="pill3">
+      <span class="pill-num">12 sec</span>
+      <span class="pill-text">US ER fall admission rate</span>
+    </div>
+    <div class="stat-pill" id="pill4">
+      <span class="pill-num">HIPAA</span>
+      <span class="pill-text">compliant · privacy-first</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CAPABILITIES ─── -->
+<section id="capabilities">
+  <div class="section-label reveal" style="text-align:center;">Complete Platform</div>
+  <h2 class="section-title reveal delay-1" style="margin:0 auto;">Everything bundled in one service line</h2>
+
+  <div class="cap-grid">
+    <div class="cap-card" style="--accent:#E63B5A;" id="cap1">
+      <div class="cap-icon" style="background:rgba(230,59,90,0.12);color:#E63B5A;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+      </div>
+      <h3>Fall Detection</h3>
+      <p>Near 100% accuracy. Detects falls in every room, including bathroom — the highest-risk zone. Real-time alerts.</p>
+    </div>
+    <div class="cap-card" style="--accent:#2D5BE3;" id="cap2">
+      <div class="cap-icon" style="background:rgba(45,91,227,0.12);color:#8AABFF;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </div>
+      <h3>Vitals Monitoring</h3>
+      <p>Breathing rate and heart rate tracked continuously, wirelessly, with no wearable required. Data logs available.</p>
+    </div>
+    <div class="cap-card" style="--accent:#00C2C7;" id="cap3">
+      <div class="cap-icon" style="background:rgba(0,194,199,0.12);color:#00C2C7;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <h3>Presence & Safety</h3>
+      <p>Proof-of-life, occupancy detection, multiple-person detection. Know your loved one is home and safe, 24/7.</p>
+    </div>
+    <div class="cap-card" style="--accent:#FFD166;" id="cap4">
+      <div class="cap-icon" style="background:rgba(255,209,102,0.12);color:#FFD166;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <h3>Whole-Home WiFi</h3>
+      <p>Mercku M6s AX3000 — 3 Gbps, PoE support, EasyMesh expansion. The connectivity backbone that runs it all.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── BUSINESS CASE ─── -->
+<section id="business">
+  <div class="section-label reveal" style="text-align:center;">For ISPs</div>
+  <h2 class="section-title reveal delay-1" style="margin:0 auto;">Built for ISPs.<br>Priced to grow.</h2>
+  <p class="section-sub reveal delay-2" style="margin:12px auto 0;">A new recurring revenue line with zero infrastructure change. Bundle with existing internet service and offer something no competitor does.</p>
+
+  <div class="biz-grid">
+    <!-- Left: steps -->
+    <div>
+      <div class="step" id="step1">
+        <div class="step-left">
+          <div class="step-num" style="background:rgba(0,194,199,0.15);color:var(--teal);border:1px solid rgba(0,194,199,0.3);">01</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>ISP deploys Mercku router</h3>
+          <p>Bundle the Mercku M6s with existing broadband. Single hardware SKU. Zero additional installation complexity. PoE support for flexible deployment.</p>
+        </div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-left">
+          <div class="step-num" style="background:rgba(45,91,227,0.15);color:#8AABFF;border:1px solid rgba(45,91,227,0.3);">02</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Pontosense activates</h3>
+          <p>Silver Shield intelligence runs over the existing WiFi signal. 3-step setup. No new hardware. No cameras, no microphones. HIPAA compliant from day one.</p>
+        </div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-left">
+          <div class="step-num" style="background:rgba(139,92,246,0.15);color:#A78BFA;border:1px solid rgba(139,92,246,0.3);">03</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Subscriber gets alerts</h3>
+          <p>Falls, vitals, presence — all monitored continuously. Family and care teams notified instantly via the app. Backed by a 24/7 external call center.</p>
+        </div>
+      </div>
+
+      <div class="why-card" id="why-card">
+        <h4>Why this works for ISPs</h4>
+        <div class="why-items">
+          <div class="why-item"><strong>Reduce churn</strong> — premium service families won't leave</div>
+          <div class="why-item"><strong>Zero truck rolls</strong> — installs in minutes</div>
+          <div class="why-item"><strong>Pure recurring revenue</strong> per active subscriber</div>
+          <div class="why-item"><strong>No compliance headache</strong> — no cameras</div>
+          <div class="why-item"><strong>First-mover advantage</strong> in your market</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: pricing + revenue -->
+    <div class="pricing-stack">
+      <div class="price-cards">
+        <div class="price-card teal" id="pc1">
+          <div class="price-big">$150</div>
+          <div class="price-label">One-Time Hardware</div>
+          <div class="price-sub">Mercku M6s + Pontosense sensor</div>
+        </div>
+        <div class="price-card blue" id="pc2">
+          <div class="price-big">$7</div>
+          <div class="price-label">/month per unit</div>
+          <div class="price-sub">Pure recurring service revenue</div>
+        </div>
+      </div>
+
+      <div class="rev-card" id="rev-card">
+        <div class="rev-label">Revenue Example</div>
+        <div class="rev-row" id="rr1">
+          <span class="rev-subs"><span class="rev-dot" style="background:var(--muted)"></span>500 subscribers</span>
+          <span class="rev-hwrev">$75,000 hardware</span>
+          <span class="rev-mrr">$3,500/mo</span>
+        </div>
+        <div class="rev-row" id="rr2">
+          <span class="rev-subs"><span class="rev-dot" style="background:var(--teal)"></span>1,000 subscribers</span>
+          <span class="rev-hwrev">$150,000 hardware</span>
+          <span class="rev-mrr">$7,000/mo</span>
+        </div>
+        <div class="rev-row" id="rr3">
+          <span class="rev-subs"><span class="rev-dot" style="background:var(--gold)"></span>5,000 subscribers</span>
+          <span class="rev-hwrev">$750,000 hardware</span>
+          <span class="rev-mrr" style="color:var(--gold)">$35,000/mo</span>
+        </div>
+      </div>
+
+      <!-- Trust badges -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+        <div class="trust-badge">500+ patents</div>
+        <div class="trust-badge">HIPAA compliant</div>
+        <div class="trust-badge">Near 100% fall detection</div>
+        <div class="trust-badge">3-step install</div>
+        <div class="trust-badge">24/7 call centre</div>
+        <div class="trust-badge">No cameras or wearables</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section id="cta">
+  <div class="cta-box" id="cta-box">
+    <div class="section-label" style="margin-bottom:12px;">Ready to Launch</div>
+    <h2>Add a Smart Home service line today.</h2>
+    <p>Contact us for ISP pricing, pilot program details, and onboarding support. We handle the setup — you collect the revenue.</p>
+
+    <div class="cta-contacts">
+      <div class="cta-contact">
+        <span class="cta-contact-label">Mercku</span>
+        <span class="cta-contact-val">shop.mercku.com</span>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div class="cta-contact">
+        <span class="cta-contact-label">Pontosense</span>
+        <span class="cta-contact-val">pontosense.com</span>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div class="cta-contact">
+        <span class="cta-contact-label">Email</span>
+        <span class="cta-contact-val">info@mercku.com</span>
+      </div>
+    </div>
+
+    <div class="cta-trust">
+      <div class="trust-badge">ISP-ready deployment</div>
+      <div class="trust-badge">Low risk, low fees</div>
+      <div class="trust-badge">Effortless integration</div>
+      <div class="trust-badge">Global shipping</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span style="color:var(--teal);font-weight:600;font-size:13px;">MERCKU</span>
+    <span style="color:var(--muted);">×</span>
+    <span style="color:#8AABFF;font-weight:600;font-size:13px;">PONTOSENSE</span>
+  </div>
+  <span>Smart Home Platform for ISPs — Confidential</span>
+  <span>shop.mercku.com · pontosense.com</span>
+</footer>
+
+<script>
+// ── PROGRESS BAR ──
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = (scrollTop / docHeight) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// ── HERO SCROLL INTERACTION ──
+// Stats stagger in on load
+setTimeout(() => {
+  ['stat-fall','stat-privacy','stat-patents','stat-speed','stat-coverage','stat-setup'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('visible');
+    }, i * 180);
+  });
+  ['stat-fall-label','stat-privacy-label','stat-patents-label',
+   'stat-speed-label','stat-coverage-label','stat-setup-label'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('visible');
+    }, i * 180 + 100);
+  });
+}, 600);
+
+// On scroll — merge the two sides, reveal unified headline
+let heroMerged = false;
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  const heroH = document.getElementById('hero').offsetHeight;
+  const scrollPct = scrollY / (heroH * 0.4);
+
+  if (scrollPct > 0.6 && !heroMerged) {
+    heroMerged = true;
+    document.getElementById('hero-merge').style.opacity = Math.min(scrollPct - 0.5, 0.92);
+    document.getElementById('hero-headline').style.opacity = Math.max(0, (scrollPct - 0.8) * 3);
+  } else if (scrollPct <= 0.6 && heroMerged) {
+    heroMerged = false;
+    document.getElementById('hero-merge').style.opacity = 0;
+    document.getElementById('hero-headline').style.opacity = 0;
+  }
+
+  if (scrollPct > 0.4) {
+    document.getElementById('hero-merge').style.opacity = Math.min((scrollPct - 0.4) * 2, 0.92);
+    document.getElementById('hero-headline').style.opacity = Math.min((scrollPct - 0.7) * 4, 1);
+  }
+});
+
+// ── FLOOR PLAN: sequential room activation on scroll ──
+let floorActivated = false;
+const roomSequence = ['bedroom','living','kitchen','bathroom','hallway'];
+const roomColors = {
+  bedroom: 'rgba(45,91,227,0.18)',
+  living: 'rgba(0,194,199,0.18)',
+  kitchen: 'rgba(255,209,102,0.15)',
+  bathroom: 'rgba(106,232,153,0.18)',
+  hallway: 'rgba(139,92,246,0.18)'
+};
+const capColors = {
+  bedroom: 'rgba(45,91,227,0.9)',
+  living: 'rgba(0,194,199,0.9)',
+  kitchen: 'rgba(255,209,102,0.9)',
+  bathroom: 'rgba(106,232,153,0.9)',
+  hallway: 'rgba(139,92,246,0.9)'
+};
+const labelColors = {
+  bedroom: 'rgba(138,171,255,0.9)',
+  living: 'rgba(0,194,199,0.9)',
+  kitchen: 'rgba(255,209,102,0.9)',
+  bathroom: 'rgba(106,232,153,0.9)',
+  hallway: 'rgba(139,92,246,0.9)'
+};
+
+function activateRoom(room) {
+  const glow = document.getElementById('glow-' + room);
+  const cap = document.getElementById('cap-' + room);
+  const lbl = document.getElementById('lbl-' + room);
+  if (glow) glow.setAttribute('fill', roomColors[room]);
+  if (cap) cap.setAttribute('fill', capColors[room]);
+  if (lbl) lbl.setAttribute('fill', labelColors[room]);
+  // Show router icon
+  const router = document.getElementById('router-icon');
+  if (router) router.setAttribute('opacity', '1');
+  // Highlight zone button
+  document.querySelectorAll('.zone-btn').forEach(btn => {
+    if (btn.dataset.room === room) {
+      btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.color = 'var(--text)';
+    }
+  });
+}
+
+// Auto-activate rooms in sequence when floor plan enters view
+const fpObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !floorActivated) {
+      floorActivated = true;
+      // Show router first
+      setTimeout(() => {
+        const router = document.getElementById('router-icon');
+        if (router) router.setAttribute('opacity', '1');
+      }, 300);
+      // Activate rooms in sequence
+      roomSequence.forEach((room, i) => {
+        setTimeout(() => activateRoom(room), 500 + i * 600);
+      });
+      // Show stat pills
+      setTimeout(() => {
+        ['pill1','pill2','pill3','pill4'].forEach((id, i) => {
+          setTimeout(() => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('visible');
+          }, i * 150);
+        });
+      }, 3500);
+    }
+  });
+}, { threshold: 0.3 });
+
+const fp = document.getElementById('floorplan');
+if (fp) fpObserver.observe(fp);
+
+// ── INTERSECTION OBSERVER for all reveal animations ──
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal, .cap-card, .step, .price-card, .rev-card, .why-card, #cta-box, .stat-pill').forEach(el => {
+  revealObserver.observe(el);
+});
+
+// Stagger cap cards
+['cap1','cap2','cap3','cap4'].forEach((id, i) => {
+  const el = document.getElementById(id);
+  if (el) el.style.transitionDelay = (i * 0.12) + 's';
+});
+
+// Stagger steps
+['step1','step2','step3'].forEach((id, i) => {
+  const el = document.getElementById(id);
+  if (el) el.style.transitionDelay = (i * 0.18) + 's';
+});
+
+// Revenue rows animate in with delay
+const revRowObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      ['rr1','rr2','rr3'].forEach((id, i) => {
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.classList.add('visible');
+        }, 400 + i * 200);
+      });
+    }
+  });
+}, { threshold: 0.4 });
+
+const rc = document.getElementById('rev-card');
+if (rc) revRowObserver.observe(rc);
+</script>
+</body>
+</html>
