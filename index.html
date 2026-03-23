@@ -105,7 +105,18 @@
 
   /* Merge overlay */
   .hero-merge { position: absolute; inset: 0; background: var(--navy); opacity: 0; pointer-events: none; z-index: 8; }
-  .hero-headline { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; z-index: 12; opacity: 0; width: 55%; pointer-events: none; }
+  .hero-headline {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 50;
+    opacity: 0;
+    width: 65%;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
   .hero-headline h1 { font-size: clamp(32px,3.5vw,52px); font-weight: 300; line-height: 1.2; margin-bottom: 16px; }
   .hero-headline h1 em { font-style: normal; color: var(--teal); }
   .hero-headline p { font-size: 15px; color: var(--muted); max-width: 460px; margin: 0 auto; }
@@ -332,7 +343,11 @@
 
   <div class="hero-merge" id="hero-merge"></div>
   <div class="hero-headline" id="hero-headline">
-    <h1>Your WiFi Router.<br><em>Now a Life Safety Platform.</em></h1>
+    <h1 style="overflow:hidden;">Your WiFi Router.<br>
+      <span style="display:inline-block;overflow:hidden;vertical-align:bottom;height:1.25em;position:relative;">
+        <span id="flip-words" style="display:block;color:var(--teal);">Now a Life Safety Platform.</span>
+      </span>
+    </h1>
     <p>Mercku mesh WiFi + Pontosense intelligent sensing — the smart home service line built for ISPs.</p>
   </div>
   <div class="scroll-cue">
@@ -532,18 +547,58 @@
       </div>
     </div>
     <div class="pricing-stack">
-      <div class="price-cards">
-        <div class="price-card teal" id="pc1"><div class="price-big">$150</div><div class="price-label">One-Time Hardware</div><div class="price-sub">Mercku M6s + Pontosense sensor</div></div>
-        <div class="price-card blue" id="pc2"><div class="price-big">$7</div><div class="price-label">/month per unit</div><div class="price-sub">Pure recurring service revenue</div></div>
+
+      <!-- Value props grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="price-card teal" id="pc1">
+          <div style="font-size:32px;margin-bottom:8px;">📦</div>
+          <div class="price-label">One-Time Hardware</div>
+          <div class="price-sub">Bundled with your existing broadband — zero extra infrastructure</div>
+        </div>
+        <div class="price-card blue" id="pc2">
+          <div style="font-size:32px;margin-bottom:8px;">🔁</div>
+          <div class="price-label">Monthly Subscription</div>
+          <div class="price-sub">Pure recurring service revenue per active subscriber</div>
+        </div>
       </div>
-      <div class="rev-card" id="rev-card">
-        <div class="rev-label">Revenue Example</div>
-        <div class="rev-row" id="rr1"><span class="rev-subs"><span class="rev-dot" style="background:var(--muted)"></span>500 subscribers</span><span>$75,000 hardware</span><span class="rev-mrr" style="color:var(--green)">$3,500/mo</span></div>
-        <div class="rev-row" id="rr2"><span class="rev-subs"><span class="rev-dot" style="background:var(--teal)"></span>1,000 subscribers</span><span>$150,000 hardware</span><span class="rev-mrr" style="color:var(--green)">$7,000/mo</span></div>
-        <div class="rev-row" id="rr3"><span class="rev-subs"><span class="rev-dot" style="background:var(--gold)"></span>5,000 subscribers</span><span>$750,000 hardware</span><span class="rev-mrr" style="color:var(--gold)">$35,000/mo</span></div>
+
+      <!-- Generic revenue card -->
+      <div class="rev-card vis" id="rev-card" style="opacity:1;">
+        <div class="rev-label">Why ISPs choose this</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
+          <div style="background:rgba(0,194,199,0.06);border:1px solid rgba(0,194,199,0.15);border-radius:10px;padding:14px 16px;">
+            <div style="font-size:22px;font-weight:500;color:var(--teal);margin-bottom:4px;">↓ Churn</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">Subscribers on premium service bundles churn significantly less than broadband-only customers</div>
+          </div>
+          <div style="background:rgba(45,91,227,0.06);border:1px solid rgba(45,91,227,0.2);border-radius:10px;padding:14px 16px;">
+            <div style="font-size:22px;font-weight:500;color:#8AABFF;margin-bottom:4px;">↑ ARPU</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">Every active subscriber generates recurring monthly service revenue on top of broadband</div>
+          </div>
+          <div style="background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.15);border-radius:10px;padding:14px 16px;">
+            <div style="font-size:22px;font-weight:500;color:var(--gold);margin-bottom:4px;">30 Days</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">Typical pilot-to-deployment timeline. No new infrastructure. No additional truck rolls.</div>
+          </div>
+          <div style="background:rgba(6,214,160,0.06);border:1px solid rgba(6,214,160,0.15);border-radius:10px;padding:14px 16px;">
+            <div style="font-size:22px;font-weight:500;color:var(--green);margin-bottom:4px;">1 Device</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">One hardware SKU delivers both carrier-grade WiFi and intelligent home sensing</div>
+          </div>
+        </div>
       </div>
+
+      <!-- CTA nudge -->
+      <div style="background:linear-gradient(135deg,rgba(0,194,199,0.08),rgba(45,91,227,0.08));border:1px solid rgba(0,194,199,0.2);border-radius:12px;padding:20px 22px;text-align:center;" class="price-card" id="pc3">
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px;">Pricing tailored for ISPs</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">Flexible hardware + subscription model designed around your subscriber base. <span style="color:var(--teal);font-weight:500;">Contact us to get a custom quote.</span></div>
+      </div>
+
       <div style="display:flex;flex-wrap:wrap;gap:7px;">
-        <div class="trust-badge">500+ patents</div><div class="trust-badge">HIPAA compliant</div><div class="trust-badge">Near 100% accuracy</div><div class="trust-badge">3-step install</div><div class="trust-badge">24/7 call centre</div><div class="trust-badge">No cameras</div>
+        <div class="trust-badge">500+ patents</div>
+        <div class="trust-badge">HIPAA compliant</div>
+        <div class="trust-badge">Near 100% accuracy</div>
+        <div class="trust-badge">3-step install</div>
+        <div class="trust-badge">24/7 call centre</div>
+        <div class="trust-badge">No cameras</div>
       </div>
     </div>
   </div>
@@ -591,17 +646,32 @@ setTimeout(() => {
   ['s1l','s2l','s3l','s4l','s5l','s6l'].forEach((id,i) => setTimeout(() => document.getElementById(id)?.classList.add('vis'), i*160+100));
 }, 500);
 
-// Hero merge on scroll
+// Hero merge on scroll — headline is fixed, fades in then fades out at next section
 window.addEventListener('scroll', () => {
   const heroH = document.getElementById('hero').offsetHeight;
+  const usecaseTop = document.getElementById('usecases')?.offsetTop || heroH * 1.5;
   const p = window.scrollY / (heroH * 0.4);
+  const headline = document.getElementById('hero-headline');
+  const merge = document.getElementById('hero-merge');
+
+  // Fade in as hero scrolls
+  let opacity = 0;
   if (p > 0.3) {
-    document.getElementById('hero-merge').style.opacity = Math.min((p-0.3)*1.6, 0.94);
-    document.getElementById('hero-headline').style.opacity = Math.min((p-0.65)*3.5, 1);
+    opacity = Math.min((p - 0.65) * 3.5, 1);
+    merge.style.opacity = Math.min((p - 0.3) * 1.6, 0.94);
   } else {
-    document.getElementById('hero-merge').style.opacity = 0;
-    document.getElementById('hero-headline').style.opacity = 0;
+    merge.style.opacity = 0;
   }
+
+  // Fade out as user approaches next section
+  const fadeStart = usecaseTop - window.innerHeight * 0.55;
+  const fadeEnd   = usecaseTop - window.innerHeight * 0.05;
+  if (window.scrollY > fadeStart) {
+    const fadeP = (window.scrollY - fadeStart) / (fadeEnd - fadeStart);
+    opacity = Math.max(0, opacity * (1 - fadeP));
+  }
+
+  headline.style.opacity = opacity;
 });
 
 // Floor plan room activation
@@ -633,10 +703,62 @@ document.querySelectorAll('.reveal,.cap-card,.step,.price-card,.rev-card,.why-ca
 ['cap1','cap2','cap3','cap4'].forEach((id,i)=>{ const el=document.getElementById(id); if(el) el.style.transitionDelay=(i*.12)+'s'; });
 ['st1','st2','st3'].forEach((id,i)=>{ const el=document.getElementById(id); if(el) el.style.transitionDelay=(i*.16)+'s'; });
 
-// Revenue rows
-new IntersectionObserver(entries => {
-  if(entries[0].isIntersecting) ['rr1','rr2','rr3'].forEach((id,i)=>setTimeout(()=>document.getElementById(id)?.classList.add('vis'),300+i*220));
-},{threshold:0.4}).observe(document.getElementById('rev-card'));
+// ── DEPARTURES BOARD FLIP ANIMATION ──
+(function() {
+  const words = [
+    'Now a Life Safety Platform.',
+    'Now a Life Saving Platform.',
+    'Now a Smart Home Platform.',
+    'Now a Peace of Mind Platform.',
+    'Now a Revenue Generator.'
+  ];
+  let current = 0;
+  const el = document.getElementById('flip-words');
+  if (!el) return;
+
+  // CSS for the flip
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes flipOut {
+      0%   { transform: translateY(0);     opacity: 1; }
+      40%  { transform: translateY(-110%); opacity: 0; }
+      100% { transform: translateY(-110%); opacity: 0; }
+    }
+    @keyframes flipIn {
+      0%   { transform: translateY(110%);  opacity: 0; }
+      60%  { transform: translateY(110%);  opacity: 0; }
+      100% { transform: translateY(0);     opacity: 1; }
+    }
+    .flip-out { animation: flipOut 0.55s cubic-bezier(0.4,0,0.2,1) forwards; }
+    .flip-in  { animation: flipIn  0.55s cubic-bezier(0.4,0,0.2,1) forwards; }
+  `;
+  document.head.appendChild(style);
+
+  function flip() {
+    const next = (current + 1) % words.length;
+
+    // Create incoming element
+    const incoming = document.createElement('span');
+    incoming.textContent = words[next];
+    incoming.style.cssText = 'display:block;position:absolute;top:0;left:0;width:100%;color:var(--teal);';
+    incoming.classList.add('flip-in');
+
+    // Outgoing
+    el.classList.add('flip-out');
+    el.style.position = 'relative';
+    el.appendChild(incoming);
+
+    setTimeout(() => {
+      el.textContent = words[next];
+      el.style.position = '';
+      el.classList.remove('flip-out');
+      current = next;
+    }, 560);
+  }
+
+  // Start cycling after 2.5s, every 2.8s
+  setTimeout(() => setInterval(flip, 2800), 2500);
+})();
 </script>
 
 <script>
